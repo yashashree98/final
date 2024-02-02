@@ -14,6 +14,9 @@ import SigninPage from './pages/SigninPage';
 import NavDropdown from 'react-bootstrap/NavDropdown';
 import SignupPage from './pages/SignupPage';
 import ProfilePage from './pages/ProfilePage';
+import ProtectedRoute from './components/ProtectedRoute';
+import AddServicePage from './pages/AddServicesPage';
+import AdminRoute from './components/AdminRoute';
 
 function App() {
   const { state, dispatch: ctxDispatch } = useContext(Store);
@@ -59,6 +62,25 @@ function App() {
                 ) : (
                   <Link className="nav-link" to="/signin"> Sign In </Link>
                 ) }
+                { userInfo && userInfo.isAdmin && (
+                  <NavDropdown title="Admin" id="admin-nav-dropdown">
+                    <LinkContainer to="/admin/servicelist">
+                      <NavDropdown.Item>All Services</NavDropdown.Item>
+                    </LinkContainer>
+                    <LinkContainer to="/admin/addservices">
+                      <NavDropdown.Item>Add New Services</NavDropdown.Item>
+                    </LinkContainer>
+                    <LinkContainer to="/admin/updateservices">
+                      <NavDropdown.Item>Update Services</NavDropdown.Item>
+                    </LinkContainer>
+                    <LinkContainer to="/admin/deleteservices">
+                      <NavDropdown.Item>Remove Services</NavDropdown.Item>
+                    </LinkContainer>
+                    <LinkContainer to="/admin/userlist">
+                      <NavDropdown.Item>Users</NavDropdown.Item>
+                    </LinkContainer>
+                  </NavDropdown>
+                )}
               </Nav>
             </Container>
           </Navbar>
@@ -71,7 +93,9 @@ function App() {
             <Route path="/cart" element={<CartPage />} />
             <Route path="/signin" element={<SigninPage />} />
             <Route path="/signup" element={<SignupPage />} />
-            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+            {/* Admin Routes */}
+            <Route path="/admin/servicelist" element={<AdminRoute><AddServicePage /></AdminRoute>} />
           </Routes>
           </Container>
           </main>
