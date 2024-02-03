@@ -7,7 +7,7 @@ import Nav from 'react-bootstrap/Nav';
 import Container from 'react-bootstrap/Container';
 import LinkContainer from 'react-router-bootstrap/LinkContainer';
 import Badge from 'react-bootstrap/esm/Badge';
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { Store } from './Store';
 import CartPage from './pages/CartPage';
 import SigninPage from './pages/SigninPage';
@@ -17,6 +17,9 @@ import ProfilePage from './pages/ProfilePage';
 import ProtectedRoute from './components/ProtectedRoute';
 import AddServicePage from './pages/AddServicesPage';
 import AdminRoute from './components/AdminRoute';
+import NavbarCollapse from 'react-bootstrap/esm/NavbarCollapse';
+import SearchBox from './components/SearchBox';
+import SearchPage from './pages/SearchPage';
 
 function App() {
   const { state, dispatch: ctxDispatch } = useContext(Store);
@@ -28,6 +31,7 @@ function App() {
     window.location.href = '/signin';
   }
 
+  
   return (
     <BrowserRouter>
       <div>
@@ -37,6 +41,9 @@ function App() {
               <LinkContainer to="/">
                 <Navbar.Brand>EcoMenders</Navbar.Brand>
               </LinkContainer>
+              <NavbarCollapse id="basic-navbar-nav">
+                <SearchBox />
+              </NavbarCollapse>
               <Nav className="me-auto">
                 <Link to="/cart" className="nav-link">
                   Cart 
@@ -91,6 +98,7 @@ function App() {
             <Route path="/service/:slug" element={<ServicePage />} />
             <Route path="/" element={<HomePage />} />
             <Route path="/cart" element={<CartPage />} />
+            <Route path="/search" element={<SearchPage />} />
             <Route path="/signin" element={<SigninPage />} />
             <Route path="/signup" element={<SignupPage />} />
             <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
