@@ -4,6 +4,8 @@ import { Helmet } from 'react-helmet-async';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import axios from 'axios';
+import { toast } from 'react-toastify';
+import { getError } from '../utils';
 
 
 const reducer = (state, action) => {
@@ -34,18 +36,22 @@ export default function ProfilePage() {
   });
 
   const submitHandler = async (e) => {
-      e.preventDefault();
-    try
-    {
-      const { data } = await axios.put(
-        '/api/users/profile',
+    e.preventDefault();
+
+    if (!userInfo || !userInfo.token) {
+      console.error('No user token found');
+      return; 
+    }
+
+    try {
+      const { data } = await axios.put('/api/users/profile',
         {
           name,
           email,
           password,
         },
         {
-          header: { Authorization: `Bearer ${userInfo.token}` },
+          headers: { Authorization: `Bearer ${userInfo.token}` },
         }
       );
       dispatch({
@@ -53,38 +59,57 @@ export default function ProfilePage() {
       });
       ctxDispatch({ type: 'USER_SIGNIN', payload: data });
       localStorage.setItem('userInfo', JSON.stringify(data));
-      
-    }
-    catch (err)
-    {
+      toast.success('User updated successfully');
+    } 
+    catch (err) {
       dispatch({
         type: 'FETCH_FAIL',
       });
-      alert(err.message);
+      toast.error(getError(err));
     }
   };
   
   return (
-    <div className='small-container'>
+    <div className="container small-container">
       <Helmet>
-        <title> User Profile</title>
+        <title>User Profile</title>
       </Helmet>
-      <h1 className="my-3"> User Profile</h1>
-      <form onSubmit={ submitHandler }>
+      <h1 className="my-3">User Profile</h1>
+
+      <form onSubmit={submitHandler}>
         <Form.Group className="mb-3" controlId="name">
-          <Form.Control value={name} onChange={(e) => setName(e.target.value)} required />
+          <Form.Label>Name</Form.Label>
+          <Form.Control
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
         </Form.Group>
-        <Form.Group className="mb-3" controlId="email">
-          <Form.Control value={email} onChange={(e) => setEmail(e.target.value)} required />
+        <Form.Group className="mb-3" controlId="name">
+          <Form.Label>Email</Form.Label>
+          <Form.Control
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
         </Form.Group>
         <Form.Group className="mb-3" controlId="password">
-          <Form.Control type="password" onChange={(e) => setPassword(e.target.value)} required />
+          <Form.Label>Password</Form.Label>
+          <Form.Control
+            type="password"
+            onChange={(e) => setPassword(e.target.value)}
+          />
         </Form.Group>
         <Form.Group className="mb-3" controlId="password">
-          <Form.Control type="password" onChange={(e) => setConfirmPassword(e.target.value)} required />
+          <Form.Label>Confirm Password</Form.Label>
+          <Form.Control
+            type="password"
+            onChange={(e) => setConfirmPassword(e.target.value)}
+          />
         </Form.Group>
         <div className="mb-3">
-          <Button type="submit"> Update </Button>
+          <Button type="submit">Update</Button>
         </div>
       </form>
     </div>

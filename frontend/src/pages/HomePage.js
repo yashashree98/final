@@ -5,6 +5,7 @@ import Col from 'react-bootstrap/Col';
 import Service from "../components/Service";
 import { Helmet } from 'react-helmet-async';
 
+
 const reducer = (state, action) => {
   switch(action.type) {
     case 'FETCH_REQUEST':
@@ -41,9 +42,16 @@ function HomePage() {
 
     return <div>
       <Helmet>
-        <title>EcoMenders</title>
+        <title>SuAmazon</title>
       </Helmet>
         <h1>Featured Services</h1>
+
+        &nbsp;
+        &nbsp;
+        &nbsp;
+        &nbsp;
+        &nbsp;
+
           <div className="services">
             {loading ? (<div>Loading...</div>) : error ? (<div>{error}</div>) : (
             <Row>

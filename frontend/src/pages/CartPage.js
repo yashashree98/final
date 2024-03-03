@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { Store } from '../Store'
 import { Helmet } from 'react-helmet-async';
 import Row from 'react-bootstrap/Row';
@@ -12,23 +12,30 @@ import axios from 'axios';
 
 export default function CartPage() {
     const navigate = useNavigate();
+
     const { state, dispatch: ctxDispatch } = useContext(Store);
     const {
         cart : { cartItems },
     } = state;
 
-    const updateCartHandler = async ( item, quantity ) => {
-        const { data:db } = await axios.get(`/api/services/${item._id}`);
-        if (db.countInStock < quantity) {
-            window.alert('Sorry. Service is currently unavailable!')
-            return;
+    const updateCartHandler = async (item, newQuantity) => {
+        const existingItemIndex = cartItems.findIndex((cartItem) => cartItem._id === item._id);
+    
+        if (existingItemIndex !== -1) {
+            const updatedCartItems = [...cartItems];
+            updatedCartItems[existingItemIndex].quantity = newQuantity;
+    
+            ctxDispatch({
+                type: 'UPDATE_CART_ITEM',
+                payload: updatedCartItems,
+            });
+        } else {
+            ctxDispatch({
+                type: 'CART_ADD_ITEM',
+                payload: { ...item, quantity: 1 },
+            });
         }
-        ctxDispatch({
-            type: 'CART_ADD_ITEM', 
-            payload:{...item, quantity},
-        });
     };
-
     const removeItemHandler = (item) => {
         ctxDispatch({
             type: 'CART_REMOVE_ITEM', 
@@ -37,7 +44,7 @@ export default function CartPage() {
     };
 
     const checkoutHandler = () => {
-        navigate('/signin?redirect=/shipping');
+        navigate('/signin?redirect=/order');
     };
 
     return (
@@ -65,12 +72,12 @@ export default function CartPage() {
                                         <Link to={`/service/${item.slug}`}>{item.name}</Link>
                                     </Col>
                                     <Col md={3}>
-                                      <Button variant="light" onClick={()=> updateCartHandler(item, item.quantity - 1)} disabled={item.quantity === 1}>-</Button>{' '}
+                                      <Button variant="light" onClick={()=> updateCartHandler(item, item.quantity-1)} disabled={item.quantity === 1}><i className="fas fa-minus-circle"></i></Button>{' '}
                                       <span>{item.quantity}</span>{' '}
-                                      <Button variant="light" onClick={()=> updateCartHandler(item, item.quantity + 1)} disabled={item.quantity === item.countInStock}>+</Button>{' '}
+                                      <Button variant="light" onClick={()=> updateCartHandler(item, item.quantity+1)} disabled={item.quantity === item.countInStock}><i className="fas fa-plus-circle"></i></Button>{' '}
                                     </Col>
                                     <Col md={3}>${item.price}</Col>
-                                    <Button variant="light" onClick={()=> removeItemHandler(item)}>Delete</Button>
+                                    <Button variant="light" onClick={()=> removeItemHandler(item)}><i className="fas fa-trash"></i></Button>
                                     </Row>
                                 </ListGroup.Item>
                             ))}
